@@ -1,19 +1,37 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
+using System.Reflection.Emit;
+using System.Windows.Forms;
 
 namespace SmartJsonGenerator
 {
     public partial class Form1 : Form
     {
-        JArray records = new JArray();
         dynamic root;
         JObject json = new JObject();
-        JObject attribute = new JObject();
-        int count = 0;
+        int level = -1;
+        int rootLevel = -1;
+        DataTable dt = new DataTable();
+        
         public Form1()
         {
             InitializeComponent();
+            Panel panel1 = new Panel();
+            panel1.Dock = DockStyle.Fill;
+            panel1.AutoScroll = true;
+            groupBox3.AutoSize = true;
+            groupBox3.Parent = panel1;
+            this.Controls.Add(panel1);
+
+            dt.Columns.Add("No", typeof(int));
+            dt.Columns.Add("Level", typeof(string));
+            dt.Columns.Add("Attr", typeof(string));
+            dt.Columns.Add("Val", typeof(string));
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -28,196 +46,92 @@ namespace SmartJsonGenerator
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //dataGridView1.DataSource = records;
-            rootCB.SelectedIndex = 0;
-            attrCB.SelectedIndex = 0;
+
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
             JsonString.Text = jsonString;
-            Console.Write(jsonString);
+            string path = Directory.GetCurrentDirectory();
+            var actualPath = path.Substring(0, path.LastIndexOf("bin", StringComparison.Ordinal));
+            var projectPath = new Uri(actualPath).LocalPath;
+            var file = projectPath + "\\myJson.txt";
+            using (StreamWriter sw = new StreamWriter(file))
+            {
+                sw.WriteLine(jsonString);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            json = new JObject();
-            root = (rootCB.SelectedItem.ToString() == "Array")? new JArray() : new JObject();
-            if (rootCB.SelectedItem.ToString() == "Array")
-            {
-                root = new JArray();
-                root.Add(new JObject());
-                json.Add(RootNameTxtBox.Text, root);
-            }
-            else
-            {
-                root = new JObject();
-                json.Add(RootNameTxtBox.Text, root);
-            }
+            rootLevel++;
+            root = new JArray();
+            root.Add(new JObject());
+            level++;
+            json.Add(RootNameTxtBox.Text, root);
             MessageBox.Show("root added successfully");
             button1.Enabled = false;
+
         }
 
         private void AddNewLevelBtn_Click(object sender, EventArgs e)
         {
-            if(levelNameTxtBox.Text == "")
-            {
-                var newObject = new JObject();
-                if (rootCB.SelectedItem.ToString() == "Array")
-                {
-                    newObject.Merge(root[0]);
-                    root.Add(newObject);
-                }
-            }
-            else
-            {
-                var jsonPath = "$." + RootNameTxtBox.Text + "[0]." + levelNameTxtBox.Text;
-                JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                retrievedObj.Add(AttributeTxtbox.Text, ValueTxtbox.Text);
-            }
+            
                 
             MessageBox.Show("level added successfully");
         }
 
         private void AddMoreBtn_Click(object sender, EventArgs e)
         {
-            
-            if(attrCB.SelectedItem.ToString() == "Value")
+            if (levelNameTxtBox.Text == "")
             {
-                if(levelNameTxtBox.Text == "")
-                {
-                    if (rootCB.SelectedItem.ToString() == "Array")
-                    {
-                        root[0].Add(AttributeTxtbox.Text, ValueTxtbox.Text);
-                    }
-                    else
-                    {
-                        root.Add(AttributeTxtbox.Text, ValueTxtbox.Text);
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                }
-                else
-                {
-                    if (rootCB.SelectedItem.ToString() == "Array")
-                    {
-
-                        var jsonPath = "$." + RootNameTxtBox.Text + "[0]." + levelNameTxtBox.Text;
-                        JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                        retrievedObj.Add(AttributeTxtbox.Text, ValueTxtbox.Text);
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                    else
-                    {
-                        var jsonPath = "$." + RootNameTxtBox.Text + "." + levelNameTxtBox.Text;
-                        JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                        retrievedObj.Add(AttributeTxtbox.Text, ValueTxtbox.Text);
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                }
-                
-            }else if(attrCB.SelectedItem.ToString() == "Object")
-            {
-                if (levelNameTxtBox.Text == "")
-                {
-                    if (rootCB.SelectedItem.ToString() == "Array")
-                    {
-                        root[0].Add(ObjectNameTxtBox.Text, new JObject(){
-                            {AttributeTxtbox.Text, ValueTxtbox.Text }
-                        });
-
-                    }
-                    else
-                    {
-                        root.Add(ObjectNameTxtBox.Text, new JObject(){
-                            {AttributeTxtbox.Text, ValueTxtbox.Text }
-                        });
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                }
-                else
-                {
-                    if (rootCB.SelectedItem.ToString() == "Array")
-                    {
-                        var jsonPath = "$." + RootNameTxtBox.Text + "." + levelNameTxtBox.Text;
-                        JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                        retrievedObj.Add(ObjectNameTxtBox.Text, new JArray(){
-                            new JObject(){
-                                {AttributeTxtbox.Text, ValueTxtbox.Text }
-                            }
-                        });
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                    else
-                    {
-                        var jsonPath = "$." + RootNameTxtBox.Text + "." + levelNameTxtBox.Text;
-                        JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                        retrievedObj.Add(ObjectNameTxtBox.Text,
-                            new JObject(){
-                                {AttributeTxtbox.Text, ValueTxtbox.Text }
-                            });
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                }
-
-                
+                root[level].Add(AttributeTxtbox.Text, ValueTxtbox.Text);
             }
             else
             {
-                if (levelNameTxtBox.Text == "")
+                if (root[level].Property(levelNameTxtBox.Text) != null)
                 {
-                    if (rootCB.SelectedItem.ToString() == "Array")
-                    {
-                        root[0].Add(ObjectNameTxtBox.Text, new JObject(){
-                            {AttributeTxtbox.Text, ValueTxtbox.Text }
-                        });
-
-                    }
-                    else
-                    {
-                        root.Add(ObjectNameTxtBox.Text, new JObject(){
-                            {AttributeTxtbox.Text, ValueTxtbox.Text }
-                        });
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
+                    var jsonPath = "$." + RootNameTxtBox.Text + "["+level+"]." + levelNameTxtBox.Text;
+                    dynamic retrievedObj = (JArray)json.SelectToken(jsonPath);
+                    retrievedObj[0].Add(AttributeTxtbox.Text, ValueTxtbox.Text);
                 }
                 else
                 {
-                    if (rootCB.SelectedItem.ToString() == "Array")
-                    {
-                        var jsonPath = "$." + RootNameTxtBox.Text + "." + levelNameTxtBox.Text;
-                        JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                        retrievedObj.Add(ObjectNameTxtBox.Text, new JArray(){
-                            new JObject(){
-                                {AttributeTxtbox.Text, ValueTxtbox.Text }
-                            }
-                        });
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
-                    else
-                    {
-                        var jsonPath = "$." + RootNameTxtBox.Text + "." + levelNameTxtBox.Text;
-                        JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                        retrievedObj.Add(ObjectNameTxtBox.Text,
-                            new JObject(){
-                                {AttributeTxtbox.Text, ValueTxtbox.Text }
-                            });
-                        AttributeTxtbox.Text = "";
-                        ValueTxtbox.Text = "";
-                    }
+                    root[level].Add(levelNameTxtBox.Text, new JArray(){
+                        new JObject(){
+                            {AttributeTxtbox.Text, ValueTxtbox.Text }
+                        }
+                    });
                 }
-
             }
+
             
+            
+            DataRow dr = dt.NewRow();
+            dr["No"] = level;
+            dr["Level"] = (levelNameTxtBox.Text != "")? levelNameTxtBox.Text : "";
+            dr["Attr"] = (AttributeTxtbox.Text !="") ? AttributeTxtbox.Text : "";
+            dr["Val"] = (ValueTxtbox.Text != "") ? ValueTxtbox.Text : "";
+            dt.Rows.Add(dr);
+            dataGridView1.DataSource = dt;
+
             MessageBox.Show("Attribute added successfully");
+            levelNameTxtBox.Text = "";
+            AttributeTxtbox.Text = "";
+            ValueTxtbox.Text = "";
+        }
+
+        private void AddNewRootElement_Click(object sender, EventArgs e)
+        {
+            if (json.Property(RootNameTxtBox.Text) != null)
+            {
+                root.Add(new JObject());
+                level++;
+                MessageBox.Show("Object added successfully");
+            }
+                
+            
         }
     }
 }
