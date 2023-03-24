@@ -35,6 +35,8 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.AddNewRootElement = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.EditButtonColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DeleteButtoncolumn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.AddMoreBtn = new System.Windows.Forms.Button();
             this.ValueTxtbox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -122,12 +124,33 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.EditButtonColumn,
+            this.DeleteButtoncolumn});
+            this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridView1.Location = new System.Drawing.Point(6, 167);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 25;
             this.dataGridView1.Size = new System.Drawing.Size(485, 194);
             this.dataGridView1.TabIndex = 12;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            // 
+            // EditButtonColumn
+            // 
+            this.EditButtonColumn.HeaderText = "Edit";
+            this.EditButtonColumn.Name = "EditButtonColumn";
+            this.EditButtonColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.EditButtonColumn.Text = "Edit";
+            this.EditButtonColumn.ToolTipText = "Edit";
+            // 
+            // DeleteButtoncolumn
+            // 
+            this.DeleteButtoncolumn.HeaderText = "Delete";
+            this.DeleteButtoncolumn.Name = "DeleteButtoncolumn";
+            this.DeleteButtoncolumn.Text = "Delete";
             // 
             // AddMoreBtn
             // 
@@ -256,5 +279,7 @@
         private Button button4;
         private DataGridView dataGridView1;
         private Button AddNewRootElement;
+        private DataGridViewButtonColumn EditButtonColumn;
+        private DataGridViewButtonColumn DeleteButtoncolumn;
     }
 }
