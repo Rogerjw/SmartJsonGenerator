@@ -7,6 +7,7 @@ using System.Data;
 using System.Dynamic;
 using System.Reflection.Emit;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SmartJsonGenerator
@@ -115,10 +116,42 @@ namespace SmartJsonGenerator
                         newArray[0].Add(AttributeTxtbox.Text, ValueTxtbox.Text);
                         root[lev].Add(levelNameTxtBox.Text, newArray);
                         DataGridViewRow row = dataGridView1.Rows[rowIndex];
-                        row.Cells[2].Value = lev;
-                        row.Cells[3].Value = levelNameTxtBox.Text;
-                        row.Cells[4].Value = AttributeTxtbox.Text;
-                        row.Cells[5].Value = ValueTxtbox.Text;
+                        dataGridView1.Rows.Remove(row);
+                        if (levelNameTxtBox.Text != valuesToUpdate[0])
+                        {
+                            string comparisonValue = valuesToUpdate[0]; // Set the comparison value
+                            for (int i = dataGridView1.Rows.Count - 1; i >= 0; i--)
+                            {
+                                DataGridViewRow r = dataGridView1.Rows[i];
+                                if (r.Cells["Level"].Value != null && r.Cells["Level"].Value.ToString() == comparisonValue)
+                                {
+                                    dataGridView1.Rows.Remove(r); // Remove the row that matches the comparison value
+                                }
+                            }
+
+
+                            foreach (JObject obj in newArray)
+                            {
+                                foreach (JProperty property in obj.Properties())
+                                {
+                                    DataRow dr = dt.NewRow();
+                                    dr["No"] = valuesToUpdate[3];
+                                    dr["Level"] = (levelNameTxtBox.Text != "") ? levelNameTxtBox.Text : "";
+                                    dr["Attr"] = (property.Name != "") ? property.Name : "";
+                                    dr["Val"] = (property.Value != null) ? property.Value.ToString() : "";
+                                    dt.Rows.Add(dr);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            DataRow dr = dt.NewRow();
+                            dr["No"] = lev;
+                            dr["Level"] = (levelNameTxtBox.Text != "") ? levelNameTxtBox.Text : "";
+                            dr["Attr"] = (AttributeTxtbox.Text != "") ? AttributeTxtbox.Text : "";
+                            dr["Val"] = (ValueTxtbox.Text != "") ? ValueTxtbox.Text : "";
+                            dt.Rows.Add(dr);
+                        }
                         dataGridView1.Refresh();
                     }
                     MessageBox.Show("Attribute updated successfully");
