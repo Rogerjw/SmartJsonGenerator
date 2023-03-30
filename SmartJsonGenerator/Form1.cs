@@ -37,7 +37,14 @@ namespace SmartJsonGenerator
         {
             string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
             JsonString.Text = jsonString;
-            Console.Write(jsonString);
+            string path = Directory.GetCurrentDirectory();
+            var actualPath = path.Substring(0, path.LastIndexOf("bin", StringComparison.Ordinal));
+            var projectPath = new Uri(actualPath).LocalPath;
+            var file = projectPath + "\\myJson.txt";
+            using (StreamWriter sw = new StreamWriter(file))
+            {
+                sw.WriteLine(jsonString);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
