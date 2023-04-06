@@ -10,7 +10,7 @@ namespace SmartJsonGenerator
         dynamic root;
         JObject json = new JObject();
         JObject attribute = new JObject();
-        int count = 0;
+        int count = -1;
         public Form1()
         {
             InitializeComponent();
@@ -49,39 +49,44 @@ namespace SmartJsonGenerator
 
         private void button1_Click(object sender, EventArgs e)
         {
-            json = new JObject();
-            root = (rootCB.SelectedItem.ToString() == "Array")? new JArray() : new JObject();
-            if (rootCB.SelectedItem.ToString() == "Array")
+            count++;
+            if (RootNameTxtBox.Text != "")
             {
-                root = new JArray();
-                root.Add(new JObject());
-                json.Add(RootNameTxtBox.Text, root);
+                json = new JObject();
+                root = (rootCB.SelectedItem.ToString() == "Array") ? new JArray() : new JObject();
+                if (rootCB.SelectedItem.ToString() == "Array")
+                {
+                    root = new JArray();
+                    root.Add(new JObject());
+                    json.Add(RootNameTxtBox.Text, root);
+                }
+                else
+                {
+                    root = new JObject();
+                    json.Add(RootNameTxtBox.Text, root);
+                }
+                MessageBox.Show("root added successfully");
+                button1.Enabled = false;
             }
             else
             {
-                root = new JObject();
-                json.Add(RootNameTxtBox.Text, root);
+                RootNameTxtBox.Focus();
+                MessageBox.Show("Enter Root please");
             }
-            MessageBox.Show("root added successfully");
-            button1.Enabled = false;
+
+            
         }
 
         private void AddNewLevelBtn_Click(object sender, EventArgs e)
         {
+            count++;
             if(levelNameTxtBox.Text == "")
             {
                 var newObject = new JObject();
                 if (rootCB.SelectedItem.ToString() == "Array")
                 {
-                    newObject.Merge(root[0]);
                     root.Add(newObject);
                 }
-            }
-            else
-            {
-                var jsonPath = "$." + RootNameTxtBox.Text + "[0]." + levelNameTxtBox.Text;
-                JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
-                retrievedObj.Add(AttributeTxtbox.Text, ValueTxtbox.Text);
             }
                 
             MessageBox.Show("level added successfully");
@@ -96,7 +101,7 @@ namespace SmartJsonGenerator
                 {
                     if (rootCB.SelectedItem.ToString() == "Array")
                     {
-                        root[0].Add(AttributeTxtbox.Text, ValueTxtbox.Text);
+                        root[count].Add(AttributeTxtbox.Text, ValueTxtbox.Text);
                     }
                     else
                     {
@@ -110,7 +115,7 @@ namespace SmartJsonGenerator
                     if (rootCB.SelectedItem.ToString() == "Array")
                     {
 
-                        var jsonPath = "$." + RootNameTxtBox.Text + "[0]." + levelNameTxtBox.Text;
+                        var jsonPath = "$." + RootNameTxtBox.Text + "["+count+"]." + levelNameTxtBox.Text;
                         JObject retrievedObj = (JObject)json.SelectToken(jsonPath);
                         retrievedObj.Add(AttributeTxtbox.Text, ValueTxtbox.Text);
                         AttributeTxtbox.Text = "";
@@ -132,7 +137,7 @@ namespace SmartJsonGenerator
                 {
                     if (rootCB.SelectedItem.ToString() == "Array")
                     {
-                        root[0].Add(ObjectNameTxtBox.Text, new JObject(){
+                        root[count].Add(ObjectNameTxtBox.Text, new JObject(){
                             {AttributeTxtbox.Text, ValueTxtbox.Text }
                         });
 
@@ -181,7 +186,7 @@ namespace SmartJsonGenerator
                 {
                     if (rootCB.SelectedItem.ToString() == "Array")
                     {
-                        root[0].Add(ObjectNameTxtBox.Text, new JObject(){
+                        root[count].Add(ObjectNameTxtBox.Text, new JObject(){
                             {AttributeTxtbox.Text, ValueTxtbox.Text }
                         });
 
