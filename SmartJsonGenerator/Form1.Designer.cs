@@ -48,6 +48,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.JsonString = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
+            this.GenerateFromFile = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -108,6 +109,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.GenerateFromFile);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.ObjectNameTxtBox);
             this.groupBox2.Controls.Add(this.attrCB);
@@ -252,6 +254,16 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // GenerateFromFile
+            // 
+            this.GenerateFromFile.Location = new System.Drawing.Point(336, 108);
+            this.GenerateFromFile.Name = "GenerateFromFile";
+            this.GenerateFromFile.Size = new System.Drawing.Size(94, 23);
+            this.GenerateFromFile.TabIndex = 12;
+            this.GenerateFromFile.Text = "Get From File";
+            this.GenerateFromFile.UseVisualStyleBackColor = true;
+            this.GenerateFromFile.Click += new System.EventHandler(this.GenerateFromFile_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -295,5 +307,6 @@
         private ComboBox attrCB;
         private Label label5;
         private TextBox ObjectNameTxtBox;
+        private Button GenerateFromFile;
     }
 }

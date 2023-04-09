@@ -231,5 +231,24 @@ namespace SmartJsonGenerator
             
             MessageBox.Show("Attribute added successfully");
         }
+
+        private void GenerateFromFile_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string path = Directory.GetCurrentDirectory();
+                var actualPath = path.Substring(0, path.LastIndexOf("bin", StringComparison.Ordinal));
+                var projectPath = new Uri(actualPath).LocalPath;
+                var jsonFilePath = projectPath + "\\myJson.txt";
+                string jsonStr = File.ReadAllText(jsonFilePath);
+                json = JsonConvert.DeserializeObject<JObject>(jsonStr);
+                MessageBox.Show("Generated successfully!");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
+        }
     }
 }
